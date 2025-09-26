@@ -13,6 +13,8 @@ export default function Home() {
   const [bill, setBill] = useState<any>(null);
   const [copied, setCopied] = useState(false);
 
+  const isFormValid = name.trim() && organizer.trim() && total.trim() && phones.trim();
+
   const shareUrl = useMemo(() => {
     if (!bill) return "";
     if (typeof window === "undefined") return "";
@@ -62,22 +64,60 @@ export default function Home() {
 
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-1">
-          <label className="block text-sm">Bill name</label>
-          <input className="w-full border rounded px-3 py-2" value={name} onChange={e=>setName(e.target.value)} placeholder="Dinner at CJ's" />
+          <label className="block text-sm">
+            Bill name <span className="text-red-500">*</span>
+          </label>
+          <input 
+            className="w-full border rounded px-3 py-2" 
+            value={name} 
+            onChange={e=>setName(e.target.value)} 
+            placeholder="Dinner at CJ's" 
+            required 
+          />
         </div>
         <div className="space-y-1">
-          <label className="block text-sm">Organizer phone</label>
-          <input className="w-full border rounded px-3 py-2" value={organizer} onChange={e=>setOrganizer(e.target.value)} placeholder="0712345678" />
+          <label className="block text-sm">
+            Organizer phone <span className="text-red-500">*</span>
+          </label>
+          <input 
+            className="w-full border rounded px-3 py-2" 
+            value={organizer} 
+            onChange={e=>setOrganizer(e.target.value)} 
+            placeholder="0712345678" 
+            required 
+          />
         </div>
         <div className="space-y-1">
-          <label className="block text-sm">Total amount (Ksh)</label>
-          <input className="w-full border rounded px-3 py-2" value={total} onChange={e=>setTotal(e.target.value)} placeholder="6000" />
+          <label className="block text-sm">
+            Total amount (Ksh) <span className="text-red-500">*</span>
+          </label>
+          <input 
+            className="w-full border rounded px-3 py-2" 
+            value={total} 
+            onChange={e=>setTotal(e.target.value)} 
+            placeholder="6000" 
+            type="number"
+            min="1"
+            required 
+          />
         </div>
         <div className="space-y-1">
-          <label className="block text-sm">Participant phones (comma-separated)</label>
-          <textarea className="w-full border rounded px-3 py-2" rows={2} value={phones} onChange={e=>setPhones(e.target.value)} placeholder="0711...,0700..." />
+          <label className="block text-sm">
+            Participant phones (comma-separated) <span className="text-red-500">*</span>
+          </label>
+          <textarea 
+            className="w-full border rounded px-3 py-2" 
+            rows={2} 
+            value={phones} 
+            onChange={e=>setPhones(e.target.value)} 
+            placeholder="0711...,0700..." 
+            required 
+          />
         </div>
-        <button disabled={loading} className="w-full bg-black text-white rounded py-2">
+        <button 
+          disabled={loading || !isFormValid} 
+          className="w-full bg-black text-white rounded py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           {loading ? "Creating..." : "Create bill"}
         </button>
         {error && <p className="text-red-600 text-sm">{error}</p>}
