@@ -108,7 +108,7 @@ export default function BillPage({ params }: { params: Promise<{ token: string }
             <div className="text-sm text-green-600">You've paid Ksh {myShare}</div>
           </div>
           <div className="flex gap-3">
-            <a href={`/bill/${encodeURIComponent(token)}/dashboard`} className="flex-1 text-center bg-blue-600 text-white rounded py-2">
+            <a href={`/bill/${encodeURIComponent(token)}/dashboard`} className="flex-1 text-center bg-black text-white rounded py-2">
               View Dashboard
             </a>
             <a href={`/bill/${encodeURIComponent(token)}/receipt`} className="flex-1 text-center bg-gray-600 text-white rounded py-2">
