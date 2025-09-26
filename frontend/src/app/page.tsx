@@ -178,9 +178,9 @@ export default function Home() {
             <a
               className="text-blue-600 text-sm underline"
               href={`https://wa.me/?text=${encodeURIComponent(`PesaSplit: ${bill.name} (Ksh ${bill.total_amount}). Pay your share: ${shareUrl}`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+          target="_blank"
+          rel="noopener noreferrer"
+        >
               Share on WhatsApp →
             </a>
           </div>
