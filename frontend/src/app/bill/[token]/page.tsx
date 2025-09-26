@@ -13,6 +13,10 @@ export default function BillPage({ params }: { params: Promise<{ token: string }
   const [message, setMessage] = useState<string | null>(null);
   const [myShare, setMyShare] = useState<number | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [otpCountdown, setOtpCountdown] = useState(0);
+  const [canResend, setCanResend] = useState(true);
 
   useEffect(() => {
     let mounted = true;
@@ -24,19 +28,37 @@ export default function BillPage({ params }: { params: Promise<{ token: string }
     };
   }, [token]);
 
+  // Countdown timer effect
+  useEffect(() => {
+    if (otpCountdown > 0) {
+      const timer = setTimeout(() => {
+        setOtpCountdown(otpCountdown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (otpCountdown === 0 && !canResend) {
+      setCanResend(true);
+    }
+  }, [otpCountdown, canResend]);
+
   async function sendOtp() {
     setMessage(null);
+    setSendingOtp(true);
     try {
       const r = await api.sendOtp(phone);
       setOtpSent(true);
+      setOtpCountdown(300); // 5 minutes countdown
+      setCanResend(false);
       if (r.dev_code) setMessage(`Dev OTP: ${r.dev_code}`);
     } catch (e: any) {
       setMessage(e.message || "Failed to send OTP");
+    } finally {
+      setSendingOtp(false);
     }
   }
 
   async function verifyOtp() {
     setMessage(null);
+    setVerifyingOtp(true);
     try {
       const r = await api.verifyOtp(phone, code);
       setSessionToken(r.token);
@@ -47,7 +69,35 @@ export default function BillPage({ params }: { params: Promise<{ token: string }
       } catch {}
     } catch (e: any) {
       setMessage(e.message || "Failed to verify OTP");
+    } finally {
+      setVerifyingOtp(false);
     }
+  }
+
+  async function resendOtp() {
+    setMessage(null);
+    setSendingOtp(true);
+    try {
+      const r = await api.sendOtp(phone);
+      setOtpCountdown(300); // Reset countdown
+      setCanResend(false);
+      if (r.dev_code) setMessage(`Dev OTP: ${r.dev_code}`);
+    } catch (e: any) {
+      setMessage(e.message || "Failed to resend OTP");
+    } finally {
+      setSendingOtp(false);
+    }
+  }
+
+  function formatTime(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  function handleOtpChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 6); // Only digits, max 6
+    setCode(value);
   }
 
   async function payNow() {
@@ -128,21 +178,78 @@ export default function BillPage({ params }: { params: Promise<{ token: string }
           </button>
         </div>
       ) : (
-        <div className="space-y-2">
-          <label className="block text-sm">Your phone number</label>
-          <input className="w-full border rounded px-3 py-2" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="0712345678" />
-          {!otpSent ? (
-            <button className="w-full bg-black text-white rounded py-2" onClick={sendOtp}>Send OTP</button>
-          ) : (
-            <div className="space-y-2">
-              <label className="block text-sm">Enter OTP</label>
-              <input className="w-full border rounded px-3 py-2" value={code} onChange={e=>setCode(e.target.value)} placeholder="123456" />
-              <button className="w-full bg-black text-white rounded py-2" onClick={verifyOtp}>Verify</button>
-            </div>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="block text-sm">Your phone number</label>
+            <input 
+              className="w-full border rounded px-3 py-2" 
+              value={phone} 
+              onChange={e=>setPhone(e.target.value)} 
+              placeholder="0712345678" 
+              disabled={otpSent}
+            />
+            {!otpSent ? (
+              <button 
+                className="w-full bg-black text-white rounded py-2 disabled:opacity-50" 
+                onClick={sendOtp}
+                disabled={!phone.trim() || sendingOtp}
+              >
+                {sendingOtp ? "Sending..." : "Send OTP"}
+              </button>
+            ) : !sessionToken ? (
+              <div className="space-y-3">
+                <div className="text-center text-sm text-gray-600">
+                  OTP sent to {phone}
+                  {otpCountdown > 0 && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      Expires in {formatTime(otpCountdown)}
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm">Enter 6-digit OTP</label>
+                  <input 
+                    className="w-full border rounded px-3 py-2 text-center text-lg tracking-widest" 
+                    value={code} 
+                    onChange={handleOtpChange} 
+                    placeholder="123456"
+                    maxLength={6}
+                    autoComplete="one-time-code"
+                  />
+                  <div className="flex gap-2">
+                    <button 
+                      className="flex-1 bg-black text-white rounded py-2 disabled:opacity-50" 
+                      onClick={verifyOtp}
+                      disabled={code.length !== 6 || verifyingOtp}
+                    >
+                      {verifyingOtp ? "Verifying..." : "Verify"}
+                    </button>
+                    <button 
+                      className="px-3 py-2 border rounded text-sm disabled:opacity-50" 
+                      onClick={resendOtp}
+                      disabled={!canResend || sendingOtp}
+                    >
+                      {sendingOtp ? "..." : "Resend"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-sm text-green-600">
+                ✅ Verified successfully
+              </div>
+            )}
+          </div>
+          
+          {sessionToken && (
+            <button 
+              disabled={!sessionToken || !bill || paying} 
+              className="w-full bg-green-600 text-white rounded py-2 disabled:opacity-50" 
+              onClick={payNow}
+            >
+              {paying ? "Initiating..." : paymentStatus === "pending" ? "Processing..." : "Pay Now"}
+            </button>
           )}
-          <button disabled={!sessionToken || !bill || paying} className="w-full bg-green-600 text-white rounded py-2 disabled:opacity-50" onClick={payNow}>
-            {paying ? "Initiating..." : paymentStatus === "pending" ? "Processing..." : "Pay Now"}
-          </button>
         </div>
       )}
       
