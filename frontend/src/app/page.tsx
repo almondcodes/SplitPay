@@ -12,6 +12,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [bill, setBill] = useState<any>(null);
   const [copied, setCopied] = useState(false);
+  const [showContactPicker, setShowContactPicker] = useState(false);
 
   const isFormValid = name.trim() && organizer.trim() && total.trim() && phones.trim();
 
@@ -34,6 +35,28 @@ export default function Home() {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {}
+  }
+
+  async function pickContacts() {
+    const nav = navigator as any;
+    if (!nav.contacts?.select) {
+      alert('Contact picker not supported on this device');
+      return;
+    }
+
+    try {
+      const contacts = await nav.contacts.select(['name', 'tel'], { multiple: true });
+      const phoneNumbers = contacts
+        .map((contact: any) => contact.tel?.[0])
+        .filter((phone: string) => phone)
+        .join(', ');
+      
+      if (phoneNumbers) {
+        setPhones(prev => prev ? `${prev}, ${phoneNumbers}` : phoneNumbers);
+      }
+    } catch (err) {
+      console.log('Contact picker cancelled or failed:', err);
+    }
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -105,14 +128,23 @@ export default function Home() {
           <label className="block text-sm">
             Participant phones (comma-separated) <span className="text-red-500">*</span>
           </label>
-          <textarea 
-            className="w-full border rounded px-3 py-2" 
-            rows={2} 
-            value={phones} 
-            onChange={e=>setPhones(e.target.value)} 
-            placeholder="0711...,0700..." 
-            required 
-          />
+          <div className="space-y-2">
+            <textarea 
+              className="w-full border rounded px-3 py-2" 
+              rows={2} 
+              value={phones} 
+              onChange={e=>setPhones(e.target.value)} 
+              placeholder="0711...,0700..." 
+              required 
+            />
+            <button 
+              type="button"
+              onClick={pickContacts}
+              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 rounded py-2 text-sm border"
+            >
+              📱 Pick from Contacts
+            </button>
+          </div>
         </div>
         <button 
           disabled={loading || !isFormValid} 
