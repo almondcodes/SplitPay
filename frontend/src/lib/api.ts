@@ -16,7 +16,7 @@ async function postForm<T>(path: string, data: Record<string, string>): Promise<
 }
 
 export const api = {
-	sendOtp: (phone_number: string) => postForm<{ ok: boolean; dev_code?: string }>("/otp/send", { phone_number }),
+	sendOtp: (phone_number: string) => postForm<{ ok: boolean; dev_code?: string; sms_sent?: boolean }>("/otp/send", { phone_number }),
 	verifyOtp: (phone_number: string, code: string) =>
 		postForm<{ ok: boolean; token: string }>("/otp/verify", { phone_number, code }),
 	createBill: (args: { name: string; organizer_phone: string; total_amount: string; participant_phones: string }) =>

@@ -48,7 +48,12 @@ export default function BillPage({ params }: { params: Promise<{ token: string }
       setOtpSent(true);
       setOtpCountdown(300); // 5 minutes countdown
       setCanResend(false);
-      if (r.dev_code) setMessage(`Dev OTP: ${r.dev_code}`);
+      
+      if (r.dev_code) {
+        setMessage(`Dev OTP: ${r.dev_code}${r.sms_sent ? ' (SMS also sent)' : ' (SMS failed)'}`);
+      } else {
+        setMessage("OTP sent to your phone");
+      }
     } catch (e: any) {
       setMessage(e.message || "Failed to send OTP");
     } finally {

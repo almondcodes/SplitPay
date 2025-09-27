@@ -13,6 +13,7 @@ from .models import OtpCode, UserIdentity, Bill, Participant, Payment
 from .serializers import BillCreateSerializer, BillDetailSerializer
 import uuid
 from .daraja import DarajaClient
+from .sms import sms_service
 
 
 def _normalize_phone(phone: str) -> str:
@@ -43,8 +44,17 @@ def otp_send(request):
     code = _generate_code()
     expires = datetime.now(timezone.utc) + timedelta(minutes=5)
     OtpCode.objects.create(phone_number=phone, code_hash=_hash_code(code), expires_at=expires)
-    # TODO: Integrate SMS provider. For now, return code in dev (do NOT do in prod)
-    return JsonResponse({"ok": True, "dev_code": code})
+    
+    # Send SMS via Africa's Talking
+    sms_sent = sms_service.send_otp(phone, code)
+    
+    # In development, also return the code for testing
+    response_data = {"ok": True}
+    if settings.DEBUG:
+        response_data["dev_code"] = code
+        response_data["sms_sent"] = sms_sent
+    
+    return JsonResponse(response_data)
 
 
 @csrf_exempt
