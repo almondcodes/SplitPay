@@ -124,3 +124,6 @@ dist
 # Temporary folders
 tmp/
 temp/
+
+# Project specific
+haba_pay_ideation.txt
