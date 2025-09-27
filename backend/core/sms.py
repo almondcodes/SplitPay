@@ -60,7 +60,7 @@ class SMSService:
             print("SMS service not available")
             return False
             
-        message = f"Your PesaSplit verification code is: {code}. Valid for 5 minutes."
+        message = f"Your SplitPay verification code is: {code}. Valid for 5 minutes."
         
         try:
             if self.provider == 'africastalking' and self.africastalking_sms:

@@ -66,7 +66,7 @@ export default function DashboardPage({ params }: { params: Promise<{ token: str
         {receiptUrl && (
           <a className="px-3 py-2 rounded border w-full sm:w-auto text-center" href={receiptUrl} target="_blank">Receipt</a>
         )}
-        <a className="px-3 py-2 rounded border w-full sm:w-auto text-center" href={`https://wa.me/?text=${encodeURIComponent(`PesaSplit: ${bill?.name ?? ''} (Ksh ${bill?.total_amount ?? ''}). Pay here: ${shareUrl}`)}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        <a className="px-3 py-2 rounded border w-full sm:w-auto text-center" href={`https://wa.me/?text=${encodeURIComponent(`SplitPay: ${bill?.name ?? ''} (Ksh ${bill?.total_amount ?? ''}). Pay here: ${shareUrl}`)}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}

@@ -138,8 +138,8 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "HabaPay API",
-    "DESCRIPTION": "API for PesaSplit/HabaPay MVP",
+    "TITLE": "SplitPay API",
+    "DESCRIPTION": "API for SplitPay - Bill splitting and payment platform",
     "VERSION": "1.0.0",
 }
 

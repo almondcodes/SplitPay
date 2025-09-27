@@ -81,7 +81,7 @@ export default function Home() {
   return (
     <div className="mx-auto max-w-xl p-6 space-y-6">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold">PesaSplit</h1>
+        <h1 className="text-2xl font-semibold">SplitPay</h1>
         <p className="text-sm text-gray-500">Split bills. Pay via M-Pesa. Easy.</p>
       </header>
 
@@ -177,7 +177,7 @@ export default function Home() {
             </Link>
             <a
               className="text-blue-600 text-sm underline"
-              href={`https://wa.me/?text=${encodeURIComponent(`PesaSplit: ${bill.name} (Ksh ${bill.total_amount}). Pay your share: ${shareUrl}`)}`}
+              href={`https://wa.me/?text=${encodeURIComponent(`SplitPay: ${bill.name} (Ksh ${bill.total_amount}). Pay your share: ${shareUrl}`)}`}
           target="_blank"
           rel="noopener noreferrer"
         >
