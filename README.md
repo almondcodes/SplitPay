@@ -1,6 +1,6 @@
 # SplitPay
 
-A bill splitting and payment platform that allows groups to split bills and pay via M-Pesa STK Push.
+Bill splitting for groups with M-Pesa STK Push payments. Django REST backend and Next.js frontend.
 
 ## Features
 
@@ -11,7 +11,7 @@ A bill splitting and payment platform that allows groups to split bills and pay 
 - **Real-time Updates**: Track payment status in real-time
 - **WhatsApp Sharing**: Share bills via WhatsApp
 
-## Tech Stack
+## Tech stack
 
 ### Backend
 - Django 5.2.6
