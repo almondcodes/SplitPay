@@ -115,8 +115,8 @@ TWILIO_FROM_NUMBER=your_twilio_number
 
 ### Branching Strategy
 
-- `main` - Production branch
-- `develop` - Development branch (default for feature branches)
+- `main` - Default / production branch
+- `develop` - Development branch (feature branches)
 - `feature/*` - Feature branches (checkout from develop)
 - `hotfix/*` - Hotfix branches (checkout from main)
 
